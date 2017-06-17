@@ -9,25 +9,6 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#include "DHT.h" // Подключаем бибилиотеку для датчиков температуры и влажности типа DHT 22, DHT 11
-//#define DHTTYPE DHT11 // Тип датчика DHT 11
-#define DHTTYPE DHT22 // Тип датчика DHT 22
-BH1750 lightMeter;
-
-#define ONE_WIRE_BUS 47
-#define TEMPERATURE_PRECISION 5
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensors(&oneWire);
-
-//DeviceAddress TL0 = { 0x28, 0xFF, 0x52, 0x1F, 0xA1, 0x16, 0x03, 0x05 };
-//DeviceAddress TL1 = { 0x28, 0xFF, 0xC0, 0xEA, 0xA0, 0x16, 0x04, 0xE9 };
-//DeviceAddress TH0 = { 0x28, 0xFF, 0x39, 0x63, 0xA1, 0x16, 0x03, 0xDE };
-//DeviceAddress TH1 = { 0x28, 0xFF, 0x60, 0x28, 0xA1, 0x16, 0x03, 0xCC };
-DeviceAddress TL0 = { 0x28, 0x30, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0x8E };
-DeviceAddress TL1 = { 0x28, 0x32, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0xE0 };
-DeviceAddress TH0 = { 0x28, 0x32, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0xE0 };
-DeviceAddress TH1 = { 0x28, 0x30, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0x8E };
-
 #define OUT_0 34
 #define OUT_1 35
 #define OUT_2 36
@@ -37,17 +18,12 @@ DeviceAddress TH1 = { 0x28, 0x30, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0x8E };
 #define OUT_6 40
 #define OUT_7 41
 
-#define auto_man 13
-
-int TemperatureSensorHiPins[2] = {42, 43}; // Массив входов от верхних датчиков
-int TemperatureSensorLowPins[2]= {44, 45}; // Массив входов от нижних датчиков
-boolean TemperatureSensorHiSwitch[2] = {1, 1}; // Массив включенных верхних датчиков
-boolean TemperatureSensorLowSwitch[2] = {1, 1}; // Массив включенных нижних датчиков
 int TemperatureSensorHiValueTemperature[2]; // Массив значений температур от верхних датчиков
 int TemperatureSensorHiValueHumidity[2]; // Массив значений влажности от верхних датчиков
 int TemperatureSensorLowValueTemperature[2]; // Массив значений температур от нижних датчиков
 int TemperatureSensorLowValueHumidity[2]; // Массив значений влажности от верхних датчиков
 
+#define auto_man 13
 
 // Установочные данные
 int setTemperature; // Установленная температура
@@ -58,18 +34,18 @@ int setHumidityDifference; // Дельта влажности
 int setLighting; // Уставка освещения
 int mOffset = 50000;
 
-// Лимиты 
-int lowerTemperatureLimit; // Нижний лимит по температуре(заданная температура - дельта температуры)
-int upperTemperatureLimit; // Верхний лимит по температуре(заданная температура + дельта температуры)
-int lowerHumidityLimit; // Нижний лимит по влажности(заданная влажность - дельта влажности)
-int upperHumidityLimit; // Верхний лимит по влажности(заданная влажность + дельта влажности
-
 // Реальные показания
 int realTemperatureHi; // Реальная температура верхних датчиков(усреднённое значение)
 int realTemperatureLow; // Реальная температура нижних датчиков(усреднённое значение)
 int realTemperatureDifference; // Реальная разница температуры верхних и нижних датчиков(Переменная реальной температуры верхних датчиков - Переменная реальной температуры нижних датчиков)
 int realHumidity; //Реальная влажность воздуха
 int lux; // Освещённость
+
+// Лимиты 
+int lowerTemperatureLimit; // Нижний лимит по температуре(заданная температура - дельта температуры)
+int upperTemperatureLimit; // Верхний лимит по температуре(заданная температура + дельта температуры)
+int lowerHumidityLimit; // Нижний лимит по влажности(заданная влажность - дельта влажности)
+int upperHumidityLimit; // Верхний лимит по влажности(заданная влажность + дельта влажности
 
 // Состояния режимов
 boolean heatingState = 0; // Переменная состояния режима нагрева
@@ -189,14 +165,8 @@ byte on[8] = {0b00110,0b01111,0b11111,0b11111,0b11111,0b11111,0b11110,0b01100};
   {  
   Serial.begin(9600);
 //  Wire.begin();
-  lightMeter.begin();
 //  time.begin();
 //  dht.begin();
-  sensors.begin();
-  sensors.setResolution(TL0, TEMPERATURE_PRECISION);
-  sensors.setResolution(TL1, TEMPERATURE_PRECISION);
-  sensors.setResolution(TH0, TEMPERATURE_PRECISION);
-  sensors.setResolution(TH1, TEMPERATURE_PRECISION);
   lcd.init();
   lcd.backlight();
   lcd.home();
@@ -273,7 +243,6 @@ byte on[8] = {0b00110,0b01111,0b11111,0b11111,0b11111,0b11111,0b11110,0b01100};
   void loop()
   {
 //    sensors.requestTemperatures();
-    getData();
     control();
     LCDML_run(_LCDML_priority);
 //    Serial.print("Input ");
