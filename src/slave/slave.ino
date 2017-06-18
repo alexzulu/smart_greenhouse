@@ -17,10 +17,12 @@ BH1750 lightMeter;
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 OneWire  ds(4);  // on pin 10 (a 4.7K resistor is necessary)
-
-DeviceAddress TL0 = { 0x28, 0x30, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0x8E };
-DeviceAddress TL1 = { 0x28, 0x32, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0xE0 };
-DeviceAddress TH0 = { 0x28, 0x32, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0xE0 };
+DeviceAddress TL0 = { 0x28, 0x5B, 0xED, 0xA9, 0x06, 0x00, 0x00, 0x15 };
+//DeviceAddress TL0 = { 0x28, 0x30, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0x8E };
+DeviceAddress TL1 = { 0x28, 0x5B, 0xED, 0xA9, 0x06, 0x00, 0x00, 0x15 };
+//DeviceAddress TL1 = { 0x28, 0x32, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0xE0 };
+DeviceAddress TH0 = { 0x28, 0x5B, 0xED, 0xA9, 0x06, 0x00, 0x00, 0x15 };
+//DeviceAddress TH0 = { 0x28, 0x32, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0xE0 };
 DeviceAddress TH1 = { 0x28, 0x30, 0xC5, 0xB8, 0x00, 0x00, 0x00, 0x8E };
 
 int TemperatureSensorHiPins[2] = {5, 6}; // Массив входов от верхних датчиков
@@ -39,7 +41,7 @@ int setTemperatureDifference; // Уставка разницы температ�
 int setHumidity; // Установленная влажность воздуха
 int setHumidityDifference; // Дельта влажности
 int setLighting; // Уставка освещения
-int mOffset = 50000;
+int mOffset = 10000;
 
 // Реальные показания
 int realTemperatureHi; // Реальная температура верхних датчиков(усреднённое значение)
@@ -62,10 +64,10 @@ int upperHumidityLimit; // Верхний лимит по влажности(з�
 // liquid crystal needs (rs, e, dat4, dat5, dat6, dat7)
 LiquidCrystal_I2C lcd(0x27, _LCDML_DISP_rows, _LCDML_DISP_rows);
 
-int debug = 2; // Режим отладки вкл/выкл 
+int debug = 1; // Режим отладки вкл/выкл 
 
 void setup() {
-   Serial.begin(9600);
+   Serial.begin(115200);
 //  Wire.begin();
   lightMeter.begin();
 //  time.begin();

@@ -1,24 +1,29 @@
 int hCount = millis();
 void getValueHiTemperatureSensors (){
   int currentMillis = millis();
-  for (int i = 0; i < 2; i++){
-    DHT dht(TemperatureSensorHiPins[i], DHTTYPE);
-    dht.begin();
-    if (TemperatureSensorHiSwitch[i]){
-      if(dht.readHumidity() > 0 && dht.readTemperature() > 0){
-        TemperatureSensorHiValueHumidity[i] = dht.readHumidity();
+  int offset = currentMillis - hCount;
+  if(offset > mOffset){
+    for (int i = 0; i < 2; i++){
+      DHT dht(TemperatureSensorHiPins[i], DHTTYPE);
+      dht.begin();
+      if (TemperatureSensorHiSwitch[i]){
+        if(dht.readHumidity() > 0 && dht.readTemperature() > 0){
+          TemperatureSensorHiValueHumidity[i] = dht.readHumidity();
+//          TemperatureSensorHiValueTemperature[i] = dht.readTemperature()
+        }
       }
     }
-  }
-//  TemperatureSensorHiValueTemperature[0] = temperatureRequest(TH0);
-//  Serial.print("TH0 = ");
-//  Serial.println(TemperatureSensorHiValueTemperature[0]);
-//  Serial.print("TH1 = ");
-//  TemperatureSensorHiValueTemperature[1] = temperatureRequest(TH1);
-//  Serial.println(TemperatureSensorHiValueTemperature[1]);
-  hCount = currentMillis;
-  if (debug == 2){
-    Serial.println("");
+    TemperatureSensorHiValueTemperature[0] = temperatureRequest(TH0);
+    TemperatureSensorHiValueTemperature[1] = temperatureRequest(TH1);
+    getRealTemperatureHi ();
+    hCount = currentMillis;
+    if (debug == 2){
+      Serial.print("TH0 = ");
+      Serial.println(TemperatureSensorHiValueTemperature[0]);
+      Serial.print("TH1 = ");
+      Serial.println(TemperatureSensorHiValueTemperature[1]);
+      Serial.println("");
+    }
   }
 }
 
@@ -43,15 +48,16 @@ void getValueLowTemperatureSensors (){
         }
       }
     }
+    TemperatureSensorLowValueTemperature[0] = getTempOneWire(TL0);
 //    TemperatureSensorLowValueTemperature[0] = temperatureRequest(TL0);
-//    Serial.print("TL0 = ");
-//    Serial.println(TemperatureSensorLowValueTemperature[0]);
-//    TemperatureSensorLowValueTemperature[1] = temperatureRequest(TL1);
-//    Serial.print("TL1 = ");
-//    Serial.println(TemperatureSensorLowValueTemperature[1]);
-  getTempOneWire(TL0);
+    TemperatureSensorLowValueTemperature[1] = temperatureRequest(TL1);
+    getRealTemperatureLow ();
     lCount = currentMillis;
     if (debug == 2){
+      Serial.print("TL0 = ");
+      Serial.println(TemperatureSensorLowValueTemperature[0]);
+      Serial.print("TL1 = ");
+      Serial.println(TemperatureSensorLowValueTemperature[1]);
       Serial.println("");
     }
   }
@@ -157,15 +163,15 @@ float temperatureRequest(DeviceAddress addr){
   return temp;
 }
 
-void getTempOneWire(DeviceAddress addr){
-  float celsius, fahrenheit;
+int getTempOneWire(DeviceAddress addr){
+  int celsius;
   byte present = 0;
   byte i;
   byte data[12];
   
   ds.reset();
   ds.select(addr);
-  ds.write(0x44, 1);        // start conversion, with parasite power on at the end
+//  ds.write(0x44, 1);        // start conversion, with parasite power on at the end
   
   delay(800);     // maybe 750ms is enough, maybe not
   // we might do a ds.depower() here, but the reset will take care of it.
@@ -173,19 +179,9 @@ void getTempOneWire(DeviceAddress addr){
   present = ds.reset();
   ds.select(addr);    
   ds.write(0xBE);         // Read Scratchpad
-
-  Serial.print("  Data = ");
-  Serial.print(present, HEX);
-  Serial.print(" ");
   for ( i = 0; i < 9; i++) {           // we need 9 bytes
     data[i] = ds.read();
-    Serial.print(data[i], HEX);
-    Serial.print(" ");
   }
-  Serial.print(" CRC=");
-  Serial.print(OneWire::crc8(data, 8), HEX);
-  Serial.println();
-
   // Convert the data to actual temperature
   // because the result is a 16 bit signed integer, it should
   // be stored to an "int16_t" type, which is always 16 bits
@@ -199,11 +195,6 @@ void getTempOneWire(DeviceAddress addr){
   //// default is 12 bit resolution, 750 ms conversion time
 
   celsius = (float)raw / 16.0;
-  fahrenheit = celsius * 1.8 + 32.0;
-  Serial.print("  Temperature = ");
-  Serial.print(celsius);
-  Serial.print(" Celsius, ");
-  Serial.print(fahrenheit);
-  Serial.println(" Fahrenheit");
+  return celsius;
 }
 

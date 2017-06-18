@@ -5,9 +5,9 @@ void getData(){
   getLight ();
 
 // Вычисляем усреднённые значения
-  getRealTemperatureHi ();
-  getRealTemperatureLow ();
-  getRealHumidityLow ();
+// getRealTemperatureHi ();
+// getRealTemperatureLow ();
+// getRealHumidityLow ();
   
   getTemperatureDifference ();
 
@@ -19,6 +19,5 @@ void getData(){
 
   lowerHumidityLimit = setHumidity - setHumidityDifference - 1;
   upperHumidityLimit = setHumidity + setHumidityDifference + 1;
-  delay(500);
 }
 
