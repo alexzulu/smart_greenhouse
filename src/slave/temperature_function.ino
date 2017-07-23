@@ -1,7 +1,7 @@
-int hCount = millis();
+unsigned int hCount = millis();
 void getValueHiTemperatureSensors (){
-  int currentMillis = millis();
-  int offset = currentMillis - hCount;
+  unsigned int currentMillis = millis();
+  unsigned int offset = currentMillis - hCount;
   if(offset > mOffset){
     for (int i = 0; i < 2; i++){
       DHT dht(TemperatureSensorHiPins[i], DHTTYPE);
@@ -27,10 +27,10 @@ void getValueHiTemperatureSensors (){
   }
 }
 
-int lCount = millis();
+unsigned int lCount = millis();
 void getValueLowTemperatureSensors (){
-  int currentMillis = millis();
-  int offset = currentMillis - lCount;
+  unsigned int currentMillis = millis();
+  unsigned int offset = currentMillis - lCount;
   if(offset > mOffset){
     for (int i = 0; i < 2; i++){
       DHT dht(TemperatureSensorLowPins[i], DHTTYPE);

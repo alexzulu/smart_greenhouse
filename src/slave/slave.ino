@@ -36,12 +36,12 @@ int TemperatureSensorLowValueHumidity[2]; // Массив значений вл�
 
 // Установочные данные
 int setTemperature; // Установленная температура
-int setTemperatureDelta; // Дельта температуры
-int setTemperatureDifference; // Уставка разницы температуры между верхом и низом теплицы
+int setTemperatureDelta = 0; // Дельта температуры
+int setTemperatureDifference = 0; // Уставка разницы температуры между верхом и низом теплицы
 int setHumidity; // Установленная влажность воздуха
-int setHumidityDifference; // Дельта влажности
+int setHumidityDifference = 0; // Дельта влажности
 int setLighting; // Уставка освещения
-int mOffset = 10000;
+unsigned int mOffset = 10000;
 
 // Реальные показания
 int realTemperatureHi; // Реальная температура верхних датчиков(усреднённое значение)
@@ -51,10 +51,10 @@ int realHumidity; //Реальная влажность воздуха
 int lux; // Освещённость
 
 // Лимиты 
-int lowerTemperatureLimit; // Нижний лимит по температуре(заданная температура - дельта температуры)
-int upperTemperatureLimit; // Верхний лимит по температуре(заданная температура + дельта температуры)
-int lowerHumidityLimit; // Нижний лимит по влажности(заданная влажность - дельта влажности)
-int upperHumidityLimit; // Верхний лимит по влажности(заданная влажность + дельта влажности
+int lowerTemperatureLimit = 0; // Нижний лимит по температуре(заданная температура - дельта температуры)
+int upperTemperatureLimit = 100; // Верхний лимит по температуре(заданная температура + дельта температуры)
+int lowerHumidityLimit = 0; // Нижний лимит по влажности(заданная влажность - дельта влажности)
+int upperHumidityLimit = 100; // Верхний лимит по влажности(заданная влажность + дельта влажности
 
   // settings for lcd 
 #define _LCDML_DISP_cols             20
@@ -67,11 +67,8 @@ LiquidCrystal_I2C lcd(0x27, _LCDML_DISP_rows, _LCDML_DISP_rows);
 int debug = 1; // Режим отладки вкл/выкл 
 
 void setup() {
-   Serial.begin(115200);
-//  Wire.begin();
+  Serial.begin(9600);
   lightMeter.begin();
-//  time.begin();
-//  dht.begin();
   sensors.begin();
   sensors.setResolution(TL0, TEMPERATURE_PRECISION);
   sensors.setResolution(TL1, TEMPERATURE_PRECISION);
@@ -83,9 +80,28 @@ void setup() {
   lcd.setCursor(5,0);
   lcd.print("Booting...");
 
+  TemperatureSensorHiValueTemperature[0] = temperatureRequest(TH0);
+  TemperatureSensorHiValueTemperature[1] = temperatureRequest(TH1);
+  TemperatureSensorLowValueTemperature[0] = temperatureRequest(TL0);
+  TemperatureSensorLowValueTemperature[1] = temperatureRequest(TL1);
+  getRealTemperatureHi ();
+  getRealTemperatureLow ();
+  getRealHumidityLow ();
+  if (debug == 2){
+    Serial.print("TH0 = ");
+    Serial.println(TemperatureSensorHiValueTemperature[0]);
+    Serial.print("TH1 = ");
+    Serial.println(TemperatureSensorHiValueTemperature[1]);
+    Serial.println("");
+    Serial.print("TL0 = ");
+    Serial.println(TemperatureSensorLowValueTemperature[0]);
+    Serial.print("TL1 = ");
+    Serial.println(TemperatureSensorLowValueTemperature[1]);
+    Serial.println("");
+  }
+
 }
 
 void loop() {
       getData();
-
 }
